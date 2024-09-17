@@ -1,18 +1,30 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { invoke } from "@tauri-apps/api/tauri";
 
 const content = ref("");
 
 async function fetchData() {
-  try {
-    const result = await invoke('dump_content');
-    content.value = result
-  } catch (error) {
-    console.error('Error:', error);
-    // 在这里处理错误，例如显示错误信息给用户
-  }
+  ws.send("start_hugo")
 }
+
+var ws = new WebSocket('ws://127.0.0.1:3030/chat');
+
+ws.onopen = () => {
+  console.log('WebSocket connected');
+  // 连接成功后可以发送消息
+};
+
+ws.onmessage = (event) => {
+  content.value += event.data + '\n';
+};
+
+ws.onerror = (error) => {
+  console.error('WebSocket error:', error);
+};
+
+ws.onclose = () => {
+  console.log('WebSocket closed');
+};
 
 </script>
 

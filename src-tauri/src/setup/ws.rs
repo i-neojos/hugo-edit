@@ -1,31 +1,10 @@
 use futures_util::{SinkExt, StreamExt, TryFutureExt};
-use tokio::sync::{mpsc};
+use tokio::sync::mpsc;
 use warp::ws::{Message, WebSocket};
-use warp::Filter;
-
 use std::process::{Command, Stdio};
 use std::io::{BufRead, BufReader};
 
-#[tokio::main]
-async fn main() {
-    // GET /chat -> websocket upgrade
-    let chat = warp::path("chat")
-        // The `ws()` filter will prepare Websocket handshake...
-        .and(warp::ws())
-        .map(|ws: warp::ws::Ws| {
-            // This will call our function if the handshake succeeds.
-            ws.on_upgrade(move |socket| user_connected(socket))
-        });
-
-    // GET / -> index html  
-    let index = warp::path::end().map(|| warp::reply::html(INDEX_HTML));
-
-    let routes = index.or(chat);
-
-    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
-}
-
-async fn user_connected(ws: WebSocket) {
+pub async fn user_connected(ws: WebSocket) {
     // Split the socket into a sender and receive of messages.
     let (mut user_ws_tx, mut user_ws_rx) = ws.split();
 
@@ -78,7 +57,6 @@ async fn start(tx: mpsc::Sender<String>) {
     for line in reader.lines() {
         let msg = line.unwrap();
         let result = tx.send(msg.clone()).await;
-        println!("read file line {}", msg.clone());
         match result {
             Ok(msg) => {
             }
@@ -102,70 +80,4 @@ async fn user_message(msg: Message, tx: mpsc::Sender<String>) {
             start(tx).await
         });    
     }
-
-    // New message from this user, send it to everyone else (except same uid)...
-    // loop {
-    //     println!("start loop");
-    //     match rx.lock().await.recv().await {
-    //         Some(msg) => {
-    //             if let Err(_disconnected) = tx.send(Message::text(msg.clone())) {
-    //                 // The tx is disconnected, our `user_disconnected` code
-    //                 // should be happening in another task, nothing more to
-    //                 // do here.
-    //             }
-    //         }
-    //         None => {
-    //             break // 通道关闭
-    //         }
-    //     }
-    //     println!("end loop");
-    // }
 }
-
-static INDEX_HTML: &str = r#"<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>Warp Chat</title>
-    </head>
-    <body>
-        <h1>Warp chat</h1>
-        <div id="chat">
-            <p><em>Connecting...</em></p>
-        </div>
-        <input type="text" id="text" />
-        <button type="button" id="send">Send</button>
-        <script type="text/javascript">
-        const chat = document.getElementById('chat');
-        const text = document.getElementById('text');
-        const uri = 'ws://' + location.host + '/chat';
-        const ws = new WebSocket(uri);
-
-        function message(data) {
-            const line = document.createElement('p');
-            line.innerText = data;
-            chat.appendChild(line);
-        }
-
-        ws.onopen = function() {
-            chat.innerHTML = '<p><em>Connected!</em></p>';
-        };
-
-        ws.onmessage = function(msg) {
-            message(msg.data);
-        };
-
-        ws.onclose = function() {
-            chat.getElementsByTagName('em')[0].innerText = 'Disconnected!';
-        };
-
-        send.onclick = function() {
-            const msg = text.value;
-            ws.send(msg);
-            text.value = '';
-
-            message('<You>: ' + msg);
-        };
-        </script>
-    </body>
-</html>
-"#;
