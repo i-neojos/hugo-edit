@@ -40,9 +40,9 @@ pub async fn user_connected(ws: WebSocket) {
 }
 
 async fn start(tx: mpsc::Sender<String>) {
-    let mut child = Command::new("tail")
+    let mut child = Command::new("sh")
         .arg("-f")
-        .arg("/Users/fuhui/file.txt")
+        .arg("scripts/start_hugo.sh")
         .stdout(Stdio::piped())
         .spawn()
         .expect("failed to execute child process");
