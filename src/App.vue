@@ -22,12 +22,14 @@ const currentView = computed(() => {
 </script>
 
 <template>
-  <div class="container">
-    <h1>Welcome to Tauri!</h1>
+  <div class="container"> 
+    <ul class="nav-links">
+      <li><a href="#/">Home</a></li> |
+      <li><a href="#/setup">启动</a></li>
+    </ul>
     
-    <a href="#/">Home</a> |
-    <a href="#/setup">启动</a> |
-
+    <hr style="border: 1cm; color: blue;">
+    
     <component :is="currentView" />
   </div>
 </template>
@@ -149,6 +151,29 @@ button {
   button:active {
     background-color: #0f0f0f69;
   }
+}
+
+.nav-links {
+  display: flex; /* 使用Flex布局 */
+  justify-content: flex-end; /* 将元素排列在容器的右侧 */
+  align-items: center; /* 元素在交叉轴上居中 */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links a {
+  color: #333;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out; /* 添加过渡效果 */
+}
+
+.nav-links a:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05); /* 鼠标悬停时放大 */
 }
 
 </style>
