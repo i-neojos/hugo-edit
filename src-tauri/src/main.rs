@@ -4,12 +4,20 @@
 use tauri::WindowEvent;
 use warp::Filter;
 mod setup;
-use setup::ws;
+use setup::{ws,conf};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn update_conf(content: &str) -> String {
+    conf::update_conf(content.to_string())
+}
+
+#[tauri::command]
+fn load_conf() -> String {
+    match conf::load_conf() {
+        Ok(data) => {return data;},
+        Err(e) => {return e;}
+    }
 }
 
 #[tauri::command]
@@ -35,7 +43,7 @@ async fn main() {
     });
     
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, dump_content])
+        .invoke_handler(tauri::generate_handler![dump_content, load_conf, update_conf])
         .on_window_event(|event| {
             match event.event() {
                 WindowEvent::CloseRequested { api, .. } => {

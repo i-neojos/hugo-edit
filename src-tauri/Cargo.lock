@@ -1306,6 +1306,7 @@ dependencies = [
  "tauri-build",
  "tokio",
  "tokio-stream",
+ "toml 0.8.19",
  "warp",
 ]
 
