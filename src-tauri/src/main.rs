@@ -21,9 +21,10 @@ fn load_conf() -> String {
 }
 
 #[tauri::command]
-fn dump_content() -> String {
+fn close_hugo() -> String {
     // 模拟从数据库或文件中获取数据
-    "这是一次特别简单的交互".to_string()
+    close_hugo_start_pid();
+    "关闭hugo".to_string()
 }
 
 #[tokio::main]
@@ -43,15 +44,15 @@ async fn main() {
     });
     
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![dump_content, load_conf, update_conf])
+        .invoke_handler(tauri::generate_handler![close_hugo, load_conf, update_conf])
         .on_window_event(|event| {
             match event.event() {
                 WindowEvent::CloseRequested { api, .. } => {
-                    get_hugo_start_pid();
+                    close_hugo_start_pid();
                     println!("CloseRequested")
                 },
                 WindowEvent::Destroyed => {
-                    get_hugo_start_pid();
+                    close_hugo_start_pid();
                     println!("destroy")
                 }
                 _ => {
@@ -62,7 +63,7 @@ async fn main() {
         .expect("error while running tauri application");
 }
 
-fn get_hugo_start_pid() {
+fn close_hugo_start_pid() {
     // 在这里执行 shell 脚本
     let output = std::process::Command::new("sh")
         .arg("-c")

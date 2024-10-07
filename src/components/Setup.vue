@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import { ref, watch } from "vue";
+import { invoke } from "@tauri-apps/api/tauri";
 
 const content = ref("");
 const textmodel = ref(null);
@@ -32,6 +33,11 @@ watch(content, (to_value, from_value ) => {
   textmodel.value.scrollTop = textmodel.value.scrollHeight;
 });
 
+async function close_hugo() {
+  // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+  await invoke("close_hugo");
+}
+
 </script>
 
 <template>
@@ -40,7 +46,7 @@ watch(content, (to_value, from_value ) => {
     <textarea ref="textmodel" v-model="content" rows="5" class="custom-textarea"></textarea>
     <div>
       <button @click="fetchData" class="custom-button">启动博客</button>
-      <button @click="" class="custom-button">关闭博客</button>
+      <button @click="close_hugo" class="custom-button">关闭博客</button>
     </div>
   </div>
 </template>
