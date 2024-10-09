@@ -3,12 +3,14 @@
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import Greet from "./components/Greet.vue";
 import Setup from "./components/Setup.vue";
+import Editor from "./components/Editor.vue";
 
 import { ref, computed } from 'vue';
 
 const routes = {
   '/': Greet,
-  '/setup': Setup
+  '/setup': Setup,
+  "/editor": Editor
 }
 
 const currentPath = ref(window.location.hash)
@@ -25,7 +27,8 @@ const currentView = computed(() => {
   <div class="container"> 
     <ul class="nav-links">
       <li><a href="#/">Home</a></li> |
-      <li><a href="#/setup">启动</a></li>
+      <li><a href="#/setup">启动</a></li> |
+      <li><a href="#/editor">编辑</a></li>
     </ul>
     
     <hr style="border: 1cm; color: blue;">

@@ -27,6 +27,15 @@ fn close_hugo() -> String {
     "关闭hugo".to_string()
 }
 
+#[tauri::command]
+async fn get_applications() -> Vec<String> {
+    println!("{}", "come into");
+    vec![
+        "option1".to_string(),
+        "option2".to_string(),
+    ]
+}
+
 #[tokio::main]
 async fn main() {
 
@@ -44,7 +53,7 @@ async fn main() {
     });
     
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![close_hugo, load_conf, update_conf])
+        .invoke_handler(tauri::generate_handler![close_hugo, load_conf, update_conf, get_applications])
         .on_window_event(|event| {
             match event.event() {
                 WindowEvent::CloseRequested { api, .. } => {
