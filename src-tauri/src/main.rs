@@ -1,10 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::WindowEvent;
+use tauri::{AppHandle, Builder, WindowEvent};
 use warp::Filter;
 mod setup;
-use setup::{ws,conf};
+use setup::{conf, ws};
+use tauri_plugin_shell::ShellExt;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -15,8 +16,12 @@ fn update_conf(content: &str) -> String {
 #[tauri::command]
 fn load_conf() -> String {
     match conf::load_conf() {
-        Ok(data) => {return data;},
-        Err(e) => {return e;}
+        Ok(data) => {
+            return data;
+        }
+        Err(e) => {
+            return e;
+        }
     }
 }
 
@@ -28,45 +33,56 @@ fn close_hugo() -> String {
 }
 
 #[tauri::command]
-async fn get_applications() -> Vec<String> {
-    println!("{}", "come into");
-    vec![
-        "option1".to_string(),
-        "option2".to_string(),
-    ]
+async fn get_applications(app_handle: AppHandle) -> Vec<String> {
+    let shell = app_handle.shell();
+    let output = shell
+        .command("echo")
+        .args(["Hello from Rust!"])
+        .output()
+        .await
+        .unwrap();
+    if output.status.success() {
+        println!("Result: {:?}", String::from_utf8(output.stdout));
+    } else {
+        println!("Exit with code: {}", output.status.code().unwrap());
+    }
+
+    vec!["option1".to_string(), "option2".to_string()]
 }
 
 #[tokio::main]
 async fn main() {
-
     tokio::spawn(async move {
         // GET /chat -> websocket upgrade
         let chat = warp::path("chat")
-        // The `ws()` filter will prepare Websocket handshake...
-        .and(warp::ws())
-        .map(|ws: warp::ws::Ws| {
-            // This will call our function if the handshake succeeds.
-            ws.on_upgrade(move |socket| ws::user_connected(socket))
-        });
+            // The `ws()` filter will prepare Websocket handshake...
+            .and(warp::ws())
+            .map(|ws: warp::ws::Ws| {
+                // This will call our function if the handshake succeeds.
+                ws.on_upgrade(move |socket| ws::user_connected(socket))
+            });
 
         warp::serve(chat).run(([127, 0, 0, 1], 3030)).await;
     });
-    
+
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![close_hugo, load_conf, update_conf, get_applications])
-        .on_window_event(|event| {
-            match event.event() {
-                WindowEvent::CloseRequested { api, .. } => {
-                    close_hugo_start_pid();
-                    println!("CloseRequested")
-                },
-                WindowEvent::Destroyed => {
-                    close_hugo_start_pid();
-                    println!("destroy")
-                }
-                _ => {
-                }
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![
+            close_hugo,
+            load_conf,
+            update_conf,
+            get_applications
+        ])
+        .on_window_event(|window, event| match event {
+            WindowEvent::CloseRequested { api, .. } => {
+                close_hugo_start_pid();
+                println!("CloseRequested")
             }
+            WindowEvent::Destroyed => {
+                close_hugo_start_pid();
+                println!("destroy")
+            }
+            _ => {}
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -83,7 +99,8 @@ fn close_hugo_start_pid() {
     let stdout = String::from_utf8_lossy(&output.stdout);
 
     // 解析输出，获取进程 ID
-    let pids: Vec<i32> = stdout.split_whitespace()
+    let pids: Vec<i32> = stdout
+        .split_whitespace()
         .filter_map(|pid_str| pid_str.parse::<i32>().ok())
         .collect();
 
@@ -95,5 +112,4 @@ fn close_hugo_start_pid() {
             .output()
             .expect("failed to kill process");
     }
-
 }

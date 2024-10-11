@@ -1,8 +1,8 @@
 use futures_util::{SinkExt, StreamExt, TryFutureExt};
+use std::io::{BufRead, BufReader};
+use std::process::{Command, Stdio};
 use tokio::sync::mpsc;
 use warp::ws::{Message, WebSocket};
-use std::process::{Command, Stdio};
-use std::io::{BufRead, BufReader};
 
 pub async fn user_connected(ws: WebSocket) {
     // Split the socket into a sender and receive of messages.
@@ -58,8 +58,7 @@ async fn start(tx: mpsc::Sender<String>) {
         let msg = line.unwrap();
         let result = tx.send(msg.clone()).await;
         match result {
-            Ok(msg) => {
-            }
+            Ok(msg) => {}
             Err(err) => {
                 println!("send error:{}", err)
             }
@@ -76,8 +75,6 @@ async fn user_message(msg: Message, tx: mpsc::Sender<String>) {
     };
 
     if msg == "start_hugo" {
-        tokio::task::spawn(async move {
-            start(tx).await
-        });    
+        tokio::task::spawn(async move { start(tx).await });
     }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 
 const options = ref([]);
 const selectedValue = ref(null);
@@ -21,8 +21,8 @@ onMounted(async () => {
 
 <template>
   <div class="dropdown-container">
-    <p class="selected-value">{{ selectedValue }}</p>
-    <select v-model="selectedValue"  class="dropdown-select">
+    <p class="selected-value">选择使用应用：「{{ selectedValue }}」 打开博客</p>
+    <select v-model="selectedValue" class="dropdown-select">
       <option v-for="option in options" :value="option" :key="option">
         {{ option }}
       </option>
@@ -30,24 +30,37 @@ onMounted(async () => {
   </div>
 </template>
 
-
 <style scoped>
 .dropdown-container {
-  display: flex;
-  align-items: center; /* 居中对齐 */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
 }
 
 .dropdown-select {
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ccc;
+  -webkit-appearance: none; /* 隐藏默认样式 */
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  padding: 8px 15px;
+  border: none;
   border-radius: 4px;
-  margin-right: 8px; /* 添加一些间距 */
+  background-color: #f2f2f2;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
-.selected-value {
-  font-size: 16px;
-  color: #333;
+.dropdown-select:hover {
+  background-color: #e8e8e8;
 }
 
+.dropdown-select option {
+  padding: 10px;
+}
+
+.dropdown-select option:hover {
+  background-color: #e0e0e0;
+}
 </style>

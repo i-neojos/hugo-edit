@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { ref, watch } from "vue";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 
 const content = ref("");
 const textmodel = ref(null);
