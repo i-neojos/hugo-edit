@@ -33,6 +33,18 @@ fn close_hugo() -> String {
 }
 
 #[tauri::command]
+async fn open_blog(app_handle: AppHandle, application: String) {
+    let shell = app_handle.shell();
+    let output = shell
+        .command("sh")
+        .arg("-c")
+        .arg("open -a Obsidian ~/Code/src/github.com/think-next/blog/content/") // 硬编码
+        .output()
+        .await
+        .unwrap();
+}
+
+#[tauri::command]
 async fn get_applications(app_handle: AppHandle) -> Vec<String> {
     let shell = app_handle.shell();
     let output = shell
@@ -79,7 +91,8 @@ async fn main() {
             close_hugo,
             load_conf,
             update_conf,
-            get_applications
+            get_applications,
+            open_blog
         ])
         .on_window_event(|window, event| match event {
             WindowEvent::CloseRequested { api, .. } => {

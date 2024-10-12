@@ -17,6 +17,11 @@ onMounted(async () => {
   }
 });
 
+async function open_blog() {
+  // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+  await invoke("open_blog", { application: selectedValue.value });
+}
+
 </script>
 
 <template>
@@ -27,6 +32,7 @@ onMounted(async () => {
         {{ option }}
       </option>
     </select>
+    <button @click="open_blog" class="custom-button">打开</button>
   </div>
 </template>
 
@@ -43,7 +49,7 @@ onMounted(async () => {
   -webkit-appearance: none; /* 隐藏默认样式 */
   -moz-appearance: none;
   appearance: none;
-  width: 100%;
+  width: 79%;
   padding: 8px 15px;
   border: none;
   border-radius: 4px;
@@ -52,6 +58,17 @@ onMounted(async () => {
   transition: all 0.2s ease-in-out;
 }
 
+.custom-button {
+  margin-left: 1%;
+  background-color: #4CAF50; /* 按钮背景色 */
+  color: #fff; /* 按钮文字颜色 */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  width: 20%;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out; /* 添加过渡效果 */
+}
 .dropdown-select:hover {
   background-color: #e8e8e8;
 }
