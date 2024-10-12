@@ -36,18 +36,26 @@ fn close_hugo() -> String {
 async fn get_applications(app_handle: AppHandle) -> Vec<String> {
     let shell = app_handle.shell();
     let output = shell
-        .command("echo")
-        .args(["Hello from Rust!"])
+        .command("sh")
+        .arg("-c")
+        .arg("ls /Applications/ | awk -F '.' '{print $1}'")
         .output()
         .await
         .unwrap();
     if output.status.success() {
-        println!("Result: {:?}", String::from_utf8(output.stdout));
+        if let Ok(lines) = String::from_utf8(output.stdout) {
+            let res: Vec<String> = lines
+                .split('\n')
+                .filter(|s| !s.is_empty()) // 过滤掉空字符串
+                .map(String::from) // 将每个 &str 转换为 String
+                .collect();
+            return res;
+        }
     } else {
         println!("Exit with code: {}", output.status.code().unwrap());
     }
 
-    vec!["option1".to_string(), "option2".to_string()]
+    vec!["Obsidian".to_string(), "GoLand".to_string()]
 }
 
 #[tokio::main]
