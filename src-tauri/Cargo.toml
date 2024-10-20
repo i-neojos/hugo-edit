@@ -21,6 +21,7 @@ warp = "0.3"
 toml = "0.8.19"
 tauri-plugin-shell = "2"
 hyper-tls = { version = "0.4.0-alpha.4" }
+lazy_static = "1.5.0"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

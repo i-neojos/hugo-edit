@@ -9,15 +9,31 @@ use tauri_plugin_shell::ShellExt;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn update_conf(content: &str) -> String {
-    conf::update_conf(content.to_string())
+fn update_conf(content: &str) -> Result<(), String> {
+    let global_conf = conf::get_config_manager();
+    let conf = global_conf.lock().unwrap();
+    conf.save(content)
 }
 
 #[tauri::command]
 fn load_conf() -> String {
-    match conf::load_conf() {
-        Ok(data) => {
-            return data;
+    let global_conf = conf::get_config_manager();
+    let mut project_conf: std::sync::MutexGuard<'_, conf::ConfigManager> =
+        global_conf.lock().unwrap();
+    match project_conf.load_conf() {
+        Ok(_) => {
+            if let Some(ref obj) = project_conf.config {
+                let result = match toml::to_string(&obj) {
+                    Ok(toml_str) => {
+                        return toml_str;
+                    }
+                    Err(err) => {
+                        return err.to_string();
+                    }
+                };
+            } else {
+                return "对象解析失败".to_string();
+            }
         }
         Err(e) => {
             return e;
