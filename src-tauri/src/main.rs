@@ -11,7 +11,7 @@ use tauri_plugin_shell::ShellExt;
 #[tauri::command]
 fn update_conf(content: &str) -> Result<(), String> {
     let global_conf = conf::get_config_manager();
-    let conf = global_conf.lock().unwrap();
+    let mut conf = global_conf.lock().unwrap();
     conf.save(content)
 }
 
