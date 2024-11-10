@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::fmt::format;
+
 use tauri::{AppHandle, Builder, WindowEvent};
 use warp::Filter;
 mod setup;
@@ -51,13 +53,21 @@ fn close_hugo() -> String {
 #[tauri::command]
 async fn open_blog(app_handle: AppHandle, application: String) {
     let shell = app_handle.shell();
-    let output = shell
-        .command("sh")
-        .arg("-c")
-        .arg("open -a Obsidian ~/Code/src/github.com/think-next/blog/content/") // 硬编码
-        .output()
-        .await
-        .unwrap();
+
+    // 通过配置文件获取博客内容的路径
+    let global_conf_manager = conf::get_config_manager().clone();
+    let project_conf = global_conf_manager.lock().unwrap();
+    if let Some(ref info) = project_conf.config {
+        let blog_content_path = format!("{}", info.blog_content);
+        println!("{}", blog_content_path);
+        let output = shell
+            .command("sh")
+            .arg("-c")
+            .arg(format!("open -a Obsidian {}", blog_content_path).to_string()) // 硬编码
+            .output()
+            .await;
+    }
+    println!("{}", "end");
 }
 
 #[tauri::command]

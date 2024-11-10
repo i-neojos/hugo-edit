@@ -7,6 +7,7 @@ use toml;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
     pub project_dir: String,
+    pub blog_content: String,
 }
 
 #[derive(Debug, Default)]
