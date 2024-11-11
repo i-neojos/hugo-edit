@@ -11,17 +11,16 @@ use tauri_plugin_shell::ShellExt;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn update_conf(content: &str) -> Result<(), String> {
+async fn update_conf(content: &str) -> Result<(), String> {
     let global_conf = conf::get_config_manager();
-    let mut conf = global_conf.lock().unwrap();
+    let mut conf = global_conf.lock().await;
     conf.save(content)
 }
 
 #[tauri::command]
-fn load_conf() -> String {
+async fn load_conf() -> String {
     let global_conf = conf::get_config_manager();
-    let mut project_conf: std::sync::MutexGuard<'_, conf::ConfigManager> =
-        global_conf.lock().unwrap();
+    let mut project_conf = global_conf.lock().await;
     match project_conf.load_conf() {
         Ok(_) => {
             if let Some(ref obj) = project_conf.config {
@@ -56,7 +55,7 @@ async fn open_blog(app_handle: AppHandle, application: String) {
 
     // 通过配置文件获取博客内容的路径
     let global_conf_manager = conf::get_config_manager().clone();
-    let project_conf = global_conf_manager.lock().unwrap();
+    let project_conf = global_conf_manager.lock().await;
     if let Some(ref info) = project_conf.config {
         let blog_content_path = format!("{}", info.blog_content);
         println!("{}", blog_content_path);

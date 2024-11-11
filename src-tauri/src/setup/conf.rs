@@ -1,7 +1,7 @@
-use futures_util::future::ok;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
-use std::{fs, io::Write, sync::Arc, sync::Mutex};
+use std::{fs, io::Write, sync::Arc};
+use tokio::sync::Mutex;
 use toml;
 
 #[derive(Debug, Deserialize, Serialize)]
