@@ -58,15 +58,13 @@ async fn open_blog(app_handle: AppHandle, application: String) {
     let project_conf = global_conf_manager.lock().await;
     if let Some(ref info) = project_conf.config {
         let blog_content_path = format!("{}", info.blog_content);
-        println!("{}", blog_content_path);
         let output = shell
             .command("sh")
             .arg("-c")
-            .arg(format!("open -a Obsidian {}", blog_content_path).to_string()) // 硬编码
+            .arg(format!("open -a {} {}", application, blog_content_path).to_string()) // 硬编码
             .output()
             .await;
     }
-    println!("{}", "end");
 }
 
 #[tauri::command]
