@@ -23,7 +23,11 @@
   "plugins": {},
   "app": {
     "security": {
-      "csp": null
+      "csp": {
+        "default-src": "'self'",
+        "frame-src": "'self' http://127.0.0.1",
+        "frame-ancestors": "'self' http://127.0.0.1"
+      }
     },
     "windows": [
       {

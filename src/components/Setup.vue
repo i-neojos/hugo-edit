@@ -49,6 +49,10 @@ async function close_hugo() {
       <button @click="close_hugo" class="custom-button">关闭博客</button>
     </div>
   </div>
+  <div>
+    下面是博客的内容：
+    <iframe src="http://127.0.0.1:1313/" frameborder="1" width="100%" height="200px"></iframe>
+  </div>
 </template>
 
 
